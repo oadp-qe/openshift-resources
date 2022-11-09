@@ -19,74 +19,6 @@ class Hooks(BaseModel):
     )
 
 
-class Metadata(BaseModel):
-    labels: Optional[Dict[str, str]] = None
-
-
-class Spec(BaseModel):
-    csiSnapshotTimeout: Optional[str] = Field(
-        None,
-        description='CSISnapshotTimeout specifies the time used to wait for CSI VolumeSnapshot status turns to ReadyToUse during creation, before returning error as timeout. The default value is 10 minute.',
-    )
-    defaultVolumesToRestic: Optional[bool] = Field(
-        None,
-        description='DefaultVolumesToRestic specifies whether restic should be used to take a backup of all pod volumes by default.',
-    )
-    excludedNamespaces: Optional[Any] = Field(
-        None,
-        description='ExcludedNamespaces contains a list of namespaces that are not included in the backup.',
-    )
-    excludedResources: Optional[Any] = Field(
-        None,
-        description='ExcludedResources is a slice of resource names that are not included in the backup.',
-    )
-    hooks: Optional[Hooks] = Field(
-        None,
-        description='Hooks represent custom behaviors that should be executed at different phases of the backup.',
-    )
-    includeClusterResources: Optional[Any] = Field(
-        None,
-        description='IncludeClusterResources specifies whether cluster-scoped resources should be included for consideration in the backup.',
-    )
-    includedNamespaces: Optional[Any] = Field(
-        None,
-        description='IncludedNamespaces is a slice of namespace names to include objects from. If empty, all namespaces are included.',
-    )
-    includedResources: Optional[Any] = Field(
-        None,
-        description='IncludedResources is a slice of resource names to include in the backup. If empty, all resources are included.',
-    )
-    labelSelector: Optional[Any] = Field(
-        None,
-        description='LabelSelector is a metav1.LabelSelector to filter with when adding individual objects to the backup. If empty or nil, all objects are included. Optional.',
-    )
-    metadata: Optional[Metadata] = None
-    orLabelSelectors: Optional[Any] = Field(
-        None,
-        description='OrLabelSelectors is list of metav1.LabelSelector to filter with when adding individual objects to the backup. If multiple provided they will be joined by the OR operator. LabelSelector as well as OrLabelSelectors cannot co-exist in backup request, only one of them can be used.',
-    )
-    orderedResources: Optional[Any] = Field(
-        None,
-        description='OrderedResources specifies the backup order of resources of specific Kind. The map key is the Kind name and value is a list of resource names separated by commas. Each resource name has format "namespace/resourcename".  For cluster resources, simply use "resourcename".',
-    )
-    snapshotVolumes: Optional[Any] = Field(
-        None,
-        description="SnapshotVolumes specifies whether to take cloud snapshots of any PV's referenced in the set of objects included in the Backup.",
-    )
-    storageLocation: Optional[str] = Field(
-        None,
-        description='StorageLocation is a string containing the name of a BackupStorageLocation where the backup should be stored.',
-    )
-    ttl: Optional[str] = Field(
-        None,
-        description='TTL is a time.Duration-parseable string describing how long the Backup should be retained for.',
-    )
-    volumeSnapshotLocations: Optional[List[str]] = Field(
-        None,
-        description='VolumeSnapshotLocations is a list containing names of VolumeSnapshotLocations associated with this backup.',
-    )
-
-
 class Phase(Enum):
     New = 'New'
     FailedValidation = 'FailedValidation'
@@ -95,68 +27,6 @@ class Phase(Enum):
     PartiallyFailed = 'PartiallyFailed'
     Failed = 'Failed'
     Deleting = 'Deleting'
-
-
-class Status(BaseModel):
-    completionTimestamp: Optional[Any] = Field(
-        None,
-        description="CompletionTimestamp records the time a backup was completed. Completion time is recorded even on failed backups. Completion time is recorded before uploading the backup object. The server's time is used for CompletionTimestamps",
-    )
-    csiVolumeSnapshotsAttempted: Optional[int] = Field(
-        None,
-        description='CSIVolumeSnapshotsAttempted is the total number of attempted CSI VolumeSnapshots for this backup.',
-    )
-    csiVolumeSnapshotsCompleted: Optional[int] = Field(
-        None,
-        description='CSIVolumeSnapshotsCompleted is the total number of successfully completed CSI VolumeSnapshots for this backup.',
-    )
-    errors: Optional[int] = Field(
-        None,
-        description="Errors is a count of all error messages that were generated during execution of the backup.  The actual errors are in the backup's log file in object storage.",
-    )
-    expiration: Optional[Any] = Field(
-        None,
-        description='Expiration is when this Backup is eligible for garbage-collection.',
-    )
-    failureReason: Optional[str] = Field(
-        None,
-        description='FailureReason is an error that caused the entire backup to fail.',
-    )
-    formatVersion: Optional[str] = Field(
-        None,
-        description='FormatVersion is the backup format version, including major, minor, and patch version.',
-    )
-    phase: Optional[Phase] = Field(
-        None, description='Phase is the current state of the Backup.'
-    )
-    progress: Optional[Any] = Field(
-        None,
-        description="Progress contains information about the backup's execution progress. Note that this information is best-effort only -- if Velero fails to update it during a backup for any reason, it may be inaccurate/stale.",
-    )
-    startTimestamp: Optional[Any] = Field(
-        None,
-        description="StartTimestamp records the time a backup was started. Separate from CreationTimestamp, since that value changes on restores. The server's time is used for StartTimestamps",
-    )
-    validationErrors: Optional[Any] = Field(
-        None,
-        description='ValidationErrors is a slice of all validation errors (if applicable).',
-    )
-    version: Optional[int] = Field(
-        None,
-        description='Version is the backup format major version. Deprecated: Please see FormatVersion',
-    )
-    volumeSnapshotsAttempted: Optional[int] = Field(
-        None,
-        description='VolumeSnapshotsAttempted is the total number of attempted volume snapshots for this backup.',
-    )
-    volumeSnapshotsCompleted: Optional[int] = Field(
-        None,
-        description='VolumeSnapshotsCompleted is the total number of successfully completed volume snapshots for this backup.',
-    )
-    warnings: Optional[int] = Field(
-        None,
-        description="Warnings is a count of all warning messages that were generated during execution of the backup. The actual warnings are in the backup's log file in object storage.",
-    )
 
 
 class AccessMode(Enum):
@@ -538,35 +408,6 @@ class StatusModel5(BaseModel):
     )
 
 
-class OnError(Enum):
-    Continue = 'Continue'
-    Fail = 'Fail'
-
-
-class Exec(BaseModel):
-    command: List[str] = Field(
-        ...,
-        description='Command is the command and arguments to execute from within a container after a pod has been restored.',
-        min_items=1,
-    )
-    container: Optional[str] = Field(
-        None,
-        description="Container is the container in the pod where the command should be executed. If not specified, the pod's first container is used.",
-    )
-    execTimeout: Optional[str] = Field(
-        None,
-        description='ExecTimeout defines the maximum amount of time Velero should wait for the hook to complete before considering the execution a failure.',
-    )
-    onError: Optional[OnError] = Field(
-        None,
-        description='OnError specifies how Velero should behave if it encounters an error executing this hook.',
-    )
-    waitTimeout: Optional[str] = Field(
-        None,
-        description='WaitTimeout defines the maximum amount of time Velero should wait for the container to be Ready before attempting to run the command.',
-    )
-
-
 class ConfigMapKeyRef(BaseModel):
     key: str = Field(..., description='The key to select.')
     name: Optional[str] = Field(
@@ -597,20 +438,6 @@ class ResourceFieldRef(BaseModel):
         description='Specifies the output format of the exposed resources, defaults to "1"',
     )
     resource: str = Field(..., description='Required: resource to select')
-
-
-class SecretKeyRef(BaseModel):
-    key: str = Field(
-        ...,
-        description='The key of the secret to select from.  Must be a valid secret key.',
-    )
-    name: Optional[str] = Field(
-        None,
-        description='Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?',
-    )
-    optional: Optional[bool] = Field(
-        None, description='Specify whether the Secret or its key must be defined'
-    )
 
 
 class ValueFrom(BaseModel):
@@ -1200,207 +1027,6 @@ class VolumeMount(BaseModel):
     )
 
 
-class InitContainer(BaseModel):
-    args: Optional[List[str]] = Field(
-        None,
-        description='Arguments to the entrypoint. The docker image\'s CMD is used if this is not provided. Variable references $(VAR_NAME) are expanded using the container\'s environment. If a variable cannot be resolved, the reference in the input string will be unchanged. Double $$ are reduced to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will produce the string literal "$(VAR_NAME)". Escaped references will never be expanded, regardless of whether the variable exists or not. Cannot be updated. More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell',
-    )
-    command: Optional[List[str]] = Field(
-        None,
-        description='Entrypoint array. Not executed within a shell. The docker image\'s ENTRYPOINT is used if this is not provided. Variable references $(VAR_NAME) are expanded using the container\'s environment. If a variable cannot be resolved, the reference in the input string will be unchanged. Double $$ are reduced to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will produce the string literal "$(VAR_NAME)". Escaped references will never be expanded, regardless of whether the variable exists or not. Cannot be updated. More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell',
-    )
-    env: Optional[List[EnvItem]] = Field(
-        None,
-        description='List of environment variables to set in the container. Cannot be updated.',
-    )
-    envFrom: Optional[List[EnvFromItem]] = Field(
-        None,
-        description='List of sources to populate environment variables in the container. The keys defined within a source must be a C_IDENTIFIER. All invalid keys will be reported as an event when the container is starting. When a key exists in multiple sources, the value associated with the last source will take precedence. Values defined by an Env with a duplicate key will take precedence. Cannot be updated.',
-    )
-    image: Optional[str] = Field(
-        None,
-        description='Docker image name. More info: https://kubernetes.io/docs/concepts/containers/images This field is optional to allow higher level config management to default or override container images in workload controllers like Deployments and StatefulSets.',
-    )
-    imagePullPolicy: Optional[str] = Field(
-        None,
-        description='Image pull policy. One of Always, Never, IfNotPresent. Defaults to Always if :latest tag is specified, or IfNotPresent otherwise. Cannot be updated. More info: https://kubernetes.io/docs/concepts/containers/images#updating-images',
-    )
-    lifecycle: Optional[Lifecycle] = Field(
-        None,
-        description='Actions that the management system should take in response to container lifecycle events. Cannot be updated.',
-    )
-    livenessProbe: Optional[LivenessProbe] = Field(
-        None,
-        description='Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes',
-    )
-    name: str = Field(
-        ...,
-        description='Name of the container specified as a DNS_LABEL. Each container in a pod must have a unique name (DNS_LABEL). Cannot be updated.',
-    )
-    ports: Optional[List[Port]] = Field(
-        None,
-        description='List of ports to expose from the container. Exposing a port here gives the system additional information about the network connections a container uses, but is primarily informational. Not specifying a port here DOES NOT prevent that port from being exposed. Any port which is listening on the default "0.0.0.0" address inside a container will be accessible from the network. Cannot be updated.',
-    )
-    readinessProbe: Optional[ReadinessProbe] = Field(
-        None,
-        description='Periodic probe of container service readiness. Container will be removed from service endpoints if the probe fails. Cannot be updated. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes',
-    )
-    resources: Optional[Resources] = Field(
-        None,
-        description='Compute Resources required by this container. Cannot be updated. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/',
-    )
-    securityContext: Optional[SecurityContext] = Field(
-        None,
-        description='SecurityContext defines the security options the container should be run with. If set, the fields of SecurityContext override the equivalent fields of PodSecurityContext. More info: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/',
-    )
-    startupProbe: Optional[StartupProbe] = Field(
-        None,
-        description="StartupProbe indicates that the Pod has successfully initialized. If specified, no other probes are executed until this completes successfully. If this probe fails, the Pod will be restarted, just as if the livenessProbe failed. This can be used to provide different probe parameters at the beginning of a Pod's lifecycle, when it might take a long time to load data or warm a cache, than during steady-state operation. This cannot be updated. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes",
-    )
-    stdin: Optional[bool] = Field(
-        None,
-        description='Whether this container should allocate a buffer for stdin in the container runtime. If this is not set, reads from stdin in the container will always result in EOF. Default is false.',
-    )
-    stdinOnce: Optional[bool] = Field(
-        None,
-        description='Whether the container runtime should close the stdin channel after it has been opened by a single attach. When stdin is true the stdin stream will remain open across multiple attach sessions. If stdinOnce is set to true, stdin is opened on container start, is empty until the first client attaches to stdin, and then remains open and accepts data until the client disconnects, at which time stdin is closed and remains closed until the container is restarted. If this flag is false, a container processes that reads from stdin will never receive an EOF. Default is false',
-    )
-    terminationMessagePath: Optional[str] = Field(
-        None,
-        description="Optional: Path at which the file to which the container's termination message will be written is mounted into the container's filesystem. Message written is intended to be brief final status, such as an assertion failure message. Will be truncated by the node if greater than 4096 bytes. The total message length across all containers will be limited to 12kb. Defaults to /dev/termination-log. Cannot be updated.",
-    )
-    terminationMessagePolicy: Optional[str] = Field(
-        None,
-        description='Indicate how the termination message should be populated. File will use the contents of terminationMessagePath to populate the container status message on both success and failure. FallbackToLogsOnError will use the last chunk of container log output if the termination message file is empty and the container exited with an error. The log output is limited to 2048 bytes or 80 lines, whichever is smaller. Defaults to File. Cannot be updated.',
-    )
-    tty: Optional[bool] = Field(
-        None,
-        description="Whether this container should allocate a TTY for itself, also requires 'stdin' to be true. Default is false.",
-    )
-    volumeDevices: Optional[List[VolumeDevice]] = Field(
-        None,
-        description='volumeDevices is the list of block devices to be used by the container.',
-    )
-    volumeMounts: Optional[List[VolumeMount]] = Field(
-        None,
-        description="Pod volumes to mount into the container's filesystem. Cannot be updated.",
-    )
-    workingDir: Optional[str] = Field(
-        None,
-        description="Container's working directory. If not specified, the container runtime's default will be used, which might be configured in the container image. Cannot be updated.",
-    )
-
-
-class Init(BaseModel):
-    initContainers: Optional[List[InitContainer]] = Field(
-        None,
-        description='InitContainers is list of init containers to be added to a pod during its restore.',
-    )
-    timeout: Optional[str] = Field(
-        None,
-        description='Timeout defines the maximum amount of time Velero should wait for the initContainers to complete.',
-    )
-
-
-class PostHook(BaseModel):
-    exec: Optional[Exec] = Field(None, description='Exec defines an exec restore hook.')
-    init: Optional[Init] = Field(None, description='Init defines an init restore hook.')
-
-
-class Resource(BaseModel):
-    excludedNamespaces: Optional[Any] = Field(
-        None,
-        description='ExcludedNamespaces specifies the namespaces to which this hook spec does not apply.',
-    )
-    excludedResources: Optional[Any] = Field(
-        None,
-        description='ExcludedResources specifies the resources to which this hook spec does not apply.',
-    )
-    includedNamespaces: Optional[Any] = Field(
-        None,
-        description='IncludedNamespaces specifies the namespaces to which this hook spec applies. If empty, it applies to all namespaces.',
-    )
-    includedResources: Optional[Any] = Field(
-        None,
-        description='IncludedResources specifies the resources to which this hook spec applies. If empty, it applies to all resources.',
-    )
-    labelSelector: Optional[Any] = Field(
-        None,
-        description='LabelSelector, if specified, filters the resources to which this hook spec applies.',
-    )
-    name: str = Field(..., description='Name is the name of this hook.')
-    postHooks: Optional[List[PostHook]] = Field(
-        None,
-        description='PostHooks is a list of RestoreResourceHooks to execute during and after restoring a resource.',
-    )
-
-
-class HooksModel(BaseModel):
-    resources: Optional[List[Resource]] = None
-
-
-class SpecModel6(BaseModel):
-    backupName: str = Field(
-        ...,
-        description='BackupName is the unique name of the Velero backup to restore from.',
-    )
-    excludedNamespaces: Optional[Any] = Field(
-        None,
-        description='ExcludedNamespaces contains a list of namespaces that are not included in the restore.',
-    )
-    excludedResources: Optional[Any] = Field(
-        None,
-        description='ExcludedResources is a slice of resource names that are not included in the restore.',
-    )
-    existingResourcePolicy: Optional[Any] = Field(
-        None,
-        description='ExistingResourcePolicy specifies the restore behaviour for the kubernetes resource to be restored',
-    )
-    hooks: Optional[HooksModel] = Field(
-        None,
-        description='Hooks represent custom behaviors that should be executed during or post restore.',
-    )
-    includeClusterResources: Optional[Any] = Field(
-        None,
-        description='IncludeClusterResources specifies whether cluster-scoped resources should be included for consideration in the restore. If null, defaults to true.',
-    )
-    includedNamespaces: Optional[Any] = Field(
-        None,
-        description='IncludedNamespaces is a slice of namespace names to include objects from. If empty, all namespaces are included.',
-    )
-    includedResources: Optional[Any] = Field(
-        None,
-        description='IncludedResources is a slice of resource names to include in the restore. If empty, all resources in the backup are included.',
-    )
-    labelSelector: Optional[Any] = Field(
-        None,
-        description='LabelSelector is a metav1.LabelSelector to filter with when restoring individual objects from the backup. If empty or nil, all objects are included. Optional.',
-    )
-    namespaceMapping: Optional[Dict[str, str]] = Field(
-        None,
-        description='NamespaceMapping is a map of source namespace names to target namespace names to restore into. Any source namespaces not included in the map will be restored into namespaces of the same name.',
-    )
-    orLabelSelectors: Optional[Any] = Field(
-        None,
-        description='OrLabelSelectors is list of metav1.LabelSelector to filter with when restoring individual objects from the backup. If multiple provided they will be joined by the OR operator. LabelSelector as well as OrLabelSelectors cannot co-exist in restore request, only one of them can be used',
-    )
-    preserveNodePorts: Optional[Any] = Field(
-        None,
-        description='PreserveNodePorts specifies whether to restore old nodePorts from backup.',
-    )
-    restorePVs: Optional[Any] = Field(
-        None,
-        description='RestorePVs specifies whether to restore all included PVs from snapshot (via the cloudprovider).',
-    )
-    restoreStatus: Optional[Any] = Field(
-        None,
-        description='RestoreStatus specifies which resources we should restore the status field. If nil, no objects are included. Optional.',
-    )
-    scheduleName: Optional[str] = Field(
-        None,
-        description='ScheduleName is the unique name of the Velero schedule to restore from. If specified, and BackupName is empty, Velero will restore from the most recent successful backup created from this schedule.',
-    )
-
 
 class PhaseModel6(Enum):
     New = 'New'
@@ -1410,39 +1036,6 @@ class PhaseModel6(Enum):
     PartiallyFailed = 'PartiallyFailed'
     Failed = 'Failed'
 
-
-class StatusModel6(BaseModel):
-    completionTimestamp: Optional[Any] = Field(
-        None,
-        description="CompletionTimestamp records the time the restore operation was completed. Completion time is recorded even on failed restore. The server's time is used for StartTimestamps",
-    )
-    errors: Optional[int] = Field(
-        None,
-        description='Errors is a count of all error messages that were generated during execution of the restore. The actual errors are stored in object storage.',
-    )
-    failureReason: Optional[str] = Field(
-        None,
-        description='FailureReason is an error that caused the entire restore to fail.',
-    )
-    phase: Optional[PhaseModel6] = Field(
-        None, description='Phase is the current state of the Restore'
-    )
-    progress: Optional[Any] = Field(
-        None,
-        description="Progress contains information about the restore's execution progress. Note that this information is best-effort only -- if Velero fails to update it during a restore for any reason, it may be inaccurate/stale.",
-    )
-    startTimestamp: Optional[Any] = Field(
-        None,
-        description="StartTimestamp records the time the restore operation was started. The server's time is used for StartTimestamps",
-    )
-    validationErrors: Optional[Any] = Field(
-        None,
-        description='ValidationErrors is a slice of all validation errors (if applicable)',
-    )
-    warnings: Optional[int] = Field(
-        None,
-        description='Warnings is a count of all warning messages that were generated during execution of the restore. The actual warnings are stored in object storage.',
-    )
 
 
 class HooksModel1(BaseModel):
@@ -1598,45 +1191,6 @@ class StatusModel9(BaseModel):
         description='VolumeSnapshotLocationPhase is the lifecycle phase of a Velero VolumeSnapshotLocation.',
     )
 
-
-class Backup(BaseModel):
-    apiVersion: Optional[str] = Field(
-        None,
-        description='APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources',
-    )
-    kind: Optional[str] = Field(
-        None,
-        description='Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds',
-    )
-    metadata: Optional[v1.ObjectMeta] = Field(
-        None,
-        description="Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
-    )
-    spec: Optional[Spec] = Field(
-        None, description='BackupSpec defines the specification for a Velero backup.'
-    )
-    status: Optional[Status] = Field(
-        None, description='BackupStatus captures the current status of a Velero backup.'
-    )
-
-
-class BackupList(BaseModel):
-    apiVersion: Optional[str] = Field(
-        None,
-        description='APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources',
-    )
-    items: List[Backup] = Field(
-        ...,
-        description='List of backups. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md',
-    )
-    kind: Optional[str] = Field(
-        None,
-        description='Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds',
-    )
-    metadata: Optional[v1.ListMeta] = Field(
-        None,
-        description='Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds',
-    )
 
 
 class BackupStorageLocation(BaseModel):
@@ -1890,46 +1444,6 @@ class ResticRepositoryList(BaseModel):
         description='Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds',
     )
 
-
-class Restore(BaseModel):
-    apiVersion: Optional[str] = Field(
-        None,
-        description='APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources',
-    )
-    kind: Optional[str] = Field(
-        None,
-        description='Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds',
-    )
-    metadata: Optional[v1.ObjectMeta] = Field(
-        None,
-        description="Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
-    )
-    spec: Optional[SpecModel6] = Field(
-        None, description='RestoreSpec defines the specification for a Velero restore.'
-    )
-    status: Optional[StatusModel6] = Field(
-        None,
-        description='RestoreStatus captures the current status of a Velero restore',
-    )
-
-
-class RestoreList(BaseModel):
-    apiVersion: Optional[str] = Field(
-        None,
-        description='APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources',
-    )
-    items: List[Restore] = Field(
-        ...,
-        description='List of restores. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md',
-    )
-    kind: Optional[str] = Field(
-        None,
-        description='Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds',
-    )
-    metadata: Optional[v1.ListMeta] = Field(
-        None,
-        description='Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds',
-    )
 
 
 class Schedule(BaseModel):
